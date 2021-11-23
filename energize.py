@@ -7,6 +7,8 @@ import logging
 import pathlib
 import string
 import sys
+import threading
+import time
 from textwrap import TextWrapper
 
 import click
@@ -176,6 +178,38 @@ class AoCEnergizer:
                 with open(solution_file, "w") as code:
                     code.write(template.render(date=date, input_file=PUZZLE_FILE))
 
+class Spinner:
+    busy = False
+    delay = 0.25
+
+    @staticmethod
+    def spinning_cursor():
+        while 1:
+            for cursor in "|/-\\":
+                yield cursor
+
+    def __init__(self, delay=None):
+        self.spinner_generator = self.spinning_cursor()
+        if delay and float(delay):
+            self.delay = delay
+
+    def spinner_task(self):
+        while self.busy:
+            sys.stdout.write(next(self.spinner_generator))
+            sys.stdout.flush()
+            time.sleep(self.delay)
+            sys.stdout.write("\b")
+            sys.stdout.flush()
+
+    def __enter__(self):
+        self.busy = True
+        threading.Thread(target=self.spinner_task).start()
+
+    def __exit__(self, exception, value, tb):
+        self.busy = False
+        time.sleep(self.delay)
+        if exception is not None:
+            return False
 
 @click.group(invoke_without_command=True)
 @click.pass_context
@@ -211,10 +245,11 @@ def download(energizer, year):
     start_date = datetime.datetime.strptime(f"12 01 {year}", "%m %d %Y")
     today = datetime.datetime.now()
 
-    for i in range(25):
-        date = start_date + datetime.timedelta(days=i)
-        if date < today:
-            energizer.process_day(date)
+    with Spinner():
+        for i in range(25):
+            date = start_date + datetime.timedelta(days=i)
+            if date < today:
+                energizer.process_day(date)
 
 
 @cli.command()
@@ -231,7 +266,7 @@ def config(energizer, key, value):
 
     if not key:
         for k, v in config.items():
-            click.echo(f"{k} : {v} {type(v)}")
+            click.echo(f"{k} : {v}")
     elif not value:
 
         click.echo(f"{key.upper()} : {config[key.upper()]}")
