@@ -1,0 +1,4 @@
+BeautifulSoup4
+Click
+Jinja2
+Requests
