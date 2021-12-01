@@ -16,32 +16,27 @@ with open(input_file, "r") as data:
     puzzle_input = data.read().splitlines()
 
 
-def count_increases(sonar_measurements: list) -> int:
-    increases = 0
-    for index, depth in enumerate(sonar_measurements):
-        if index == 0:
-            continue
-        if sonar_measurements[index - 1] < depth:
-            increases += 1
-    return increases
+def count_depths(sonar_measurements: list) -> int:
+    return sum(
+        [d2 > d1 for d1, d2 in zip(sonar_measurements, sonar_measurements[1:])]
+    )
 
 
 if __name__ == "__main__":
-    puzzle_input = [int(x) for x in puzzle_input]
+
+    depths = [int(x) for x in puzzle_input]
+
     ##################
     # --- Part 1 --- #
     ##################
-
-    print(count_increases(puzzle_input))
+    print(count_depths(depths))
 
     ##################
     # --- Part 2 --- #
     ##################
 
-    puzzle_input_window = []
-    for index in range(len(puzzle_input)):
-        # Guard clause to prevent cyclically wrapping of the list
-        if index + 3 > len(puzzle_input):
-            break
-        puzzle_input_window.append(sum(puzzle_input[index : index + 3]))
-    print(count_increases(puzzle_input_window))
+    window_size = 3
+    depths_window = [
+        sum(depths[i : i + window_size]) for i in range(len(depths) - window_size + 1)
+    ]
+    print(count_depths(depths_window))
