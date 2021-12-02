@@ -9,6 +9,8 @@ Problem : https://adventofcode.com/2021/day/2
 import pathlib
 import pprint
 
+import numpy
+
 pp = pprint.PrettyPrinter(indent=4)
 
 input_file = pathlib.Path(__file__).parent.resolve().joinpath("input.txt")
@@ -17,38 +19,45 @@ with open(input_file, "r") as data:
 
 
 class Submarine:
-    def __init__(self):
-        self.horizontal = 0
-        self.depth = 0
+    def __init__(self, use_aim: bool = False):
+        if use_aim:
+            self.__aim = 0
+        else:
+            self.__aim = None
+
+        self.__horizontal = 0
+        self.__depth = 0
+
+    @property
+    def horizontal(self):
+        return self.__horizontal
+
+    @property
+    def depth(self):
+        return self.__depth
 
     @property
     def position(self):
-        return self.horizontal * self.depth
+        return self.horizontal, self.depth
 
-    def down(self, count: int):
-        self.depth += count
+    def down(self, moves: int):
+        if self.__aim is not None:
+            self.__aim += moves
+        else:
+            self.__depth += moves
 
-    def up(self, count: int):
-        self.depth -= count
+    def up(self, moves: int):
+        if self.__aim is not None:
+            self.__aim -= moves
+        else:
+            self.__depth -= moves
 
-    def forward(self, count: int):
-        self.horizontal += count
-
-
-class Improved_Submarine(Submarine):
-    def __init__(self):
-        super().__init__()
-        self.aim = 0
-
-    def down(self, count: int):
-        self.aim += count
-
-    def up(self, count: int):
-        self.aim -= count
-
-    def forward(self, count: int):
-        self.horizontal += count
-        self.depth += self.aim * count
+    def forward(self, moves: int):
+        if self.__aim is not None:
+            self.__horizontal += moves
+            self.__depth += self.__aim * moves
+        else:
+            self.__horizontal += moves
 
 
 if __name__ == "__main__":
@@ -62,13 +71,13 @@ if __name__ == "__main__":
     for command, count in commands:
         action = getattr(submarine, command)
         action(int(count))
-    print(submarine.position)
+    print(numpy.prod(submarine.position))
 
     ##################
     # --- Part 2 --- #
     ##################
-    submarine = Improved_Submarine()
+    submarine = Submarine(use_aim=True)
     for command, count in commands:
         action = getattr(submarine, command)
         action(int(count))
-    print(submarine.position)
+    print(numpy.prod(submarine.position))
