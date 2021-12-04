@@ -23,6 +23,38 @@ def count_bits(bit_position: int, diagnostic_codes: list):
     return on_bits, off_bits
 
 
+def get_oxygen_generator_rating(diagnostic_codes: list, cribit_position: int = 0):
+    if len(diagnostic_codes) == 1:
+        return int("".join(diagnostic_codes.pop()), 2)
+    if bit_position > len(diagnostic_codes[0]):
+        raise IndexError("Bit position is out of range.")
+    on_bits, off_bits = count_bits(bit_position, diagnostic_codes)
+    if on_bits >= off_bits:
+        bit_criteria = "1"
+    else:
+        bit_criteria = "0"
+    return get_oxygen_generator_rating(
+        [code for code in diagnostic_codes if code[bit_position] == bit_criteria],
+        bit_position + 1,
+    )
+
+
+def get_co2_srubber_rating(diagnostic_codes: list, bit_position: int = 0):
+    if len(diagnostic_codes) == 1:
+        return int("".join(diagnostic_codes.pop()), 2)
+    if bit_position > len(diagnostic_codes[0]):
+        raise IndexError("Bit position is out of range.")
+    on_bits, off_bits = count_bits(bit_position, diagnostic_codes)
+    if on_bits >= off_bits:
+        bit_criteria = "0"
+    else:
+        bit_criteria = "1"
+    return get_co2_srubber_rating(
+        [code for code in diagnostic_codes if code[bit_position] == bit_criteria],
+        bit_position + 1,
+    )
+
+
 if __name__ == "__main__":
 
     diagnostic_report = [list(x) for x in puzzle_input]
@@ -31,52 +63,18 @@ if __name__ == "__main__":
     # --- Part 1 --- #
     ##################
     gamma_rate = []
-    epsilon_rate = []
-
     for bit_position in range(len(diagnostic_report[0])):
         on_bits, off_bits = count_bits(bit_position, diagnostic_report)
         if on_bits > off_bits:
             gamma_rate.append("1")
-            epsilon_rate.append("0")
         else:
             gamma_rate.append("0")
-            epsilon_rate.append("1")
-
+    epsilon_rate = ["1" if bit == "0" else "0" for bit in gamma_rate]
     print(int("".join(gamma_rate), 2) * int("".join(epsilon_rate), 2))
 
     ##################
     # --- Part 2 --- #
     ##################
-
-    oxygen_generator_rating = diagnostic_report.copy()
-    for bit_position in range(len(diagnostic_report[0])):
-        if len(oxygen_generator_rating) == 1:
-            break
-        on_bits, off_bits = count_bits(bit_position, oxygen_generator_rating)
-        if on_bits >= off_bits:
-            bit_criteria = "1"
-        else:
-            bit_criteria = "0"
-        oxygen_generator_rating = [
-            x for x in oxygen_generator_rating if x[bit_position] == bit_criteria
-        ]
-    oxygen_generator_rating = oxygen_generator_rating.pop()
-
-    co2_srubber_rating = diagnostic_report.copy()
-    for bit_position in range(len(diagnostic_report[0])):
-        if len(co2_srubber_rating) == 1:
-            break
-        on_bits, off_bits = count_bits(bit_position, co2_srubber_rating)
-        if on_bits >= off_bits:
-            bit_criteria = "0"
-        else:
-            bit_criteria = "1"
-        co2_srubber_rating = [
-            x for x in co2_srubber_rating if x[bit_position] == bit_criteria
-        ]
-    co2_srubber_rating = co2_srubber_rating.pop()
-
-    print(
-        int("".join(oxygen_generator_rating), 2)
-        * int("".join(co2_srubber_rating), 2)
-    )
+    oxygen_generator_rating = get_oxygen_generator_rating(diagnostic_report.copy())
+    co2_srubber_rating = get_co2_srubber_rating(diagnostic_report.copy())
+    print(oxygen_generator_rating * co2_srubber_rating)
