@@ -23,21 +23,16 @@ if __name__ == "__main__":
     # --- Part 1 --- #
     ##################
     desired_aligment = sorted(crab_alignment)[int(len(crab_alignment) / 2)]
-    fuel_spent = 0
-    for crab in crab_alignment:
-        fuel_spent += abs(crab - desired_aligment)
+    fuel_spent = sum([abs(crab - desired_aligment) for crab in crab_alignment])
     print(fuel_spent)
 
     ##################
     # --- Part 2 --- #
     ##################
-    desired_aligment = [ int(sum(crab_alignment) / len(crab_alignment)), int(round(sum(crab_alignment) / len(crab_alignment), 0)) ]
-
-    cheapest_fuel = sum(range(max(crab_alignment)+1))*len(crab_alignment)
-    for aligment in desired_aligment:
-        fuel_spent = 0
-        for crab in crab_alignment:
-            fuel_spent += sum(range(abs(crab - aligment) + 1))
-        if fuel_spent < cheapest_fuel:
-            cheapest_fuel = fuel_spent
-    print(f"{cheapest_fuel}")
+    average = int(sum(crab_alignment) / len(crab_alignment))
+    desired_aligment = list(range(average - 1, average + 2))
+    fuel_spent = [
+        sum([sum(range(abs(crab - aligment) + 1)) for crab in crab_alignment])
+        for aligment in desired_aligment
+    ]
+    print(min(fuel_spent))
