@@ -10,7 +10,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install depende
 pip install -r requirements.txt
 ```
 
-Add your [Session Cookie](https://adventofcode.com/2021/auth/login) to enable downloading puzzel input.
+Add your [Session Cookie](https://adventofcode.com/2021/auth/login) to enable downloading puzzle input.
 
 ```bash
 energize.py config SESSION_ID <SESSION>
