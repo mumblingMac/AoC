@@ -92,9 +92,7 @@ class AoCEnergizer:
         if cls.__instance is None:
             cls.__instance = cls.__new__(cls)
             cls.__instance.__config_file = (
-                pathlib.Path(__file__)
-                .parent.resolve()
-                .joinpath(f".{pathlib.Path(__file__).stem}")
+                pathlib.Path(__file__).parent.resolve().joinpath(f".{pathlib.Path(__file__).stem}")
             )
             cls.__instance.__config_data = None
             cls.__advent_of_code = None
@@ -155,10 +153,7 @@ class AoCEnergizer:
             if puzzle_file.exists():
                 pass
             elif not self.config.get("SESSION_ID"):
-                logger.warning(
-                    "SESSION_ID is required. "
-                    "Your puzzle input is specific to your account."
-                )
+                logger.warning("SESSION_ID is required. " "Your puzzle input is specific to your account.")
             else:
                 puzzle_input = self.advent_of_code.get_puzzle_input(date)
                 if puzzle_input is not None:
@@ -170,13 +165,12 @@ class AoCEnergizer:
             if solution_file.exists():
                 logger.debug("Solution file has been previously written.")
             else:
-                template_file = (
-                    pathlib.Path(__file__).parent.resolve().joinpath("code.tmpl")
-                )
+                template_file = pathlib.Path(__file__).parent.resolve().joinpath("code.tmpl")
                 with open(template_file, "r") as file:
                     template = Template(file.read())
                 with open(solution_file, "w") as code:
                     code.write(template.render(date=date, input_file=PUZZLE_FILE))
+
 
 class Spinner:
     busy = False
@@ -211,6 +205,7 @@ class Spinner:
         if exception is not None:
             return False
 
+
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(context):
@@ -219,10 +214,8 @@ def cli(context):
         today = datetime.datetime.now()
         opening_day = datetime.datetime.strptime(f"12 01 {today.year}", "%m %d %Y")
 
-        if today.month == 11 and today.day >= 26:
-            opening_day = datetime.datetime.strptime(
-                f"12 01 {today.year + 1}", "%m %d %Y"
-            )
+        if today.month == 12 and today.day >= 26:
+            opening_day = datetime.datetime.strptime(f"12 01 {today.year + 1}", "%m %d %Y")
 
         days_until_start = (opening_day - today).days
 
